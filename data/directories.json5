@@ -1,0 +1,11 @@
+{
+  lastUpdated: 1719705314,
+  names: [
+    // Python
+    '__pycache__',
+    'venv',
+    '.venv',
+    // JavaScript/TypeScript
+    'node_modules',
+  ],
+}

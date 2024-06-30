@@ -15,6 +15,8 @@ import os
 import shutil
 from rich.console import Console  # pip install rich
 from rich.progress import Progress
+from httpx import get, HTTPStatusError  # pip install httpx
+from json5 import loads  # pip install json5
 
 # Create console
 console = Console()
@@ -28,16 +30,34 @@ if not os.path.isdir(rootPath):
 # Create empty paths list
 paths: list[str] = []
 
-# Exit if no directories were found
-if len(paths) < 1:
-    console.print("Discovered [bright_red bold]0[reset] cache directories")
-    quit()
+# Fetch the latest list of directory names
+try:
+    resp = get(
+        "https://raw.githubusercontent.com/NotAussie/Sweeper/main/data/directories.json5"
+    )
+    resp.raise_for_status()  # Using raise to handle HTTP errors
+
+    # Load the new database and overwrite the internal data
+    data = loads(resp.read())
+    cacheDirectories = data["names"]  # Overwrite the built-in database
+
+# Handle a request failure
+except HTTPStatusError as e:
+    console.print(
+        f"Unable to fetch latest cache directories, [bold]some directories may not be detected"
+    )
 
 # Discover all cache directories
 for root, dirs, files in os.walk(rootPath):
     for dir in dirs:
         if dir.lower() in cacheDirectories:
             paths.append(os.path.join(root, dir))
+
+
+# Exit if no directories were found
+if len(paths) < 1:
+    console.print("Discovered [bright_red bold]0[reset] cache directories")
+    quit()
 
 # Display discovered
 console.print(
@@ -46,6 +66,7 @@ console.print(
 
 if console.input("Do you wish to continue? [Y/n]: ").lower() != "y":
     quit()
+
 
 with Progress(console=console) as progress:
     # Create the progress bar
@@ -66,7 +87,7 @@ with Progress(console=console) as progress:
             console.print(f"Deleted [bright_red bold]{path}[reset]")
 
         # Catch shutil errors
-        except shutil.Error:
+        except Exception as e:
             console.print(f"Failed to delete [bright_red bold]{path}[reset]")
 
             progress.advance(tracker)

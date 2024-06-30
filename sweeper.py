@@ -22,7 +22,11 @@ from json5 import loads  # pip install json5
 console = Console()
 
 # Get required inputs
-rootPath = console.input("Path to [bright_white bold]sweep[reset]? ")
+rootPath = console.input(
+    "Path to [bright_white bold]sweep[reset]? [Leave empty for current path]"
+)
+if rootPath == "":
+    rootPath = os.getcwd()
 if not os.path.isdir(rootPath):
     console.print(f"Path is [bright_red bold]not[reset] a directory")
     quit()

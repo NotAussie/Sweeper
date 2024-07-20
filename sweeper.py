@@ -6,7 +6,7 @@ cacheDirectories = [
     ".venv",
     # Node.js / Node.js compatible
     "node_modules",
-    # [ I hope to add more soon! ]
+    "npm-cache",
 ]
 # -- -- -- --
 
@@ -55,7 +55,11 @@ except HTTPStatusError as e:
 for root, dirs, files in os.walk(rootPath):
     for dir in dirs:
         if dir.lower() in cacheDirectories:
-            paths.append(os.path.join(root, dir))
+            path = os.path.join(root, dir)
+            if not any(
+                os.path.commonpath([path, folder]) == folder for folder in paths
+            ):
+                paths.append(path)
 
 
 # Exit if no directories were found

@@ -1,5 +1,5 @@
 {
-  lastUpdated: 1719705314,
+  lastUpdated: 1721459257,
   names: [
     // Python
     '__pycache__',
@@ -7,5 +7,6 @@
     '.venv',
     // JavaScript/TypeScript
     'node_modules',
+    'npm-cache',
   ],
 }
